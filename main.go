@@ -19,7 +19,7 @@ type Transaction struct {
 var db *gorm.DB
 
 func main() {
-	// Here configuring  Database setup
+	
 	dsn := "host=localhost user=postgres password=mysecretpassword dbname=transactions port=5432 sslmode=disable"
 	var err error
 	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -30,8 +30,7 @@ func main() {
 		db.AutoMigrate(&Transaction{})
 
 	r := gin.Default()
-
-	// Here POST /api/transaction/ process
+	
 	r.POST("/api/transaction/", func(c *gin.Context) {
 		var tx Transaction
 		if err := c.ShouldBindJSON(&tx); err != nil {
@@ -39,10 +38,9 @@ func main() {
 			return
 		}
 
-		tx.ID = uuid.New() // Here generate a new UUID
+		tx.ID = uuid.New() 
 		tx.Timestamp = time.Now()
-
-		// Here we are storing the transaction in DB
+		
 		if err := db.Create(&tx).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to insert transaction"})
 			return
@@ -54,7 +52,6 @@ func main() {
 			"timestamp":      tx.Timestamp,
 		})
 	})
-
-	// Start the server
+	
 	r.Run(":8080")
 }
